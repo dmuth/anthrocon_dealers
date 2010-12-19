@@ -1,0 +1,9 @@
+
+name = Anthrocon Dealers
+description = "This module holds dealer-related functionality."
+package = Anthrocon
+core = 6.x
+
+dependencies[] = uc_store
+version = 1.0
+
