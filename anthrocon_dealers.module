@@ -131,6 +131,8 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 			. "ON order_products.order_id = orders.order_id "
 		. "WHERE "
 		. "order_products.nid = '%s' "
+		. "AND orders.order_status != 'canceled' "
+		. "AND orders.order_status != 'in_checkout' "
 		. "ORDER BY "
 		. "orders.order_id ASC "
 		. $sql_limit
