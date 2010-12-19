@@ -6,7 +6,6 @@
 */
 
 
-
 /**
 * Return an array of permissions for this module.
 */
@@ -41,11 +40,12 @@ function anthrocon_dealers_main() {
 
 	$retval = "";
 
+	$retval .= drupal_get_form("anthrocon_dealers_form");
+
 // TODO: Move this into the form handler
 	$rows = anthrocon_dealers_get_tables_sold();
+$retval .= anthrocon_dealers_format_tables_sold($rows);
 	//$retval .= "<pre>" . print_r($rows, true) . "</pre>"; // Debugging
-
-	$retval .= drupal_get_form("anthrocon_dealers_form");
 
 	return($retval);
 
@@ -64,14 +64,9 @@ function anthrocon_dealers_form() {
 		"#title" => t("Dealer Tables"),
 		);
 
-	$retval["tables"]["view"] = array(
-		"#type" => "submit",
-		"#value" => t("View"),
-		);
-
 	$retval["tables"]["download"] = array(
 		"#type" => "submit",
-		"#value" => t("Download"),
+		"#value" => t("Download This List"),
 		);
 
 	return($retval);
@@ -89,9 +84,11 @@ function anthrocon_dealers_form_submit($form, $form_state) {
 /**
 * Get current dealer tables that have been sold.
 *
+* @param integer $limit an optional limit. This is used for testing/development.
+*
 * @return array An array of sold tables.
 */
-function anthrocon_dealers_get_tables_sold() {
+function anthrocon_dealers_get_tables_sold($limit = "") {
 
 	$retval = array();
 
@@ -99,6 +96,11 @@ function anthrocon_dealers_get_tables_sold() {
 	// Hard-coded to the NID of the dealers table
 	//
 	$nid = 6135;
+
+	$sql_limit = "";
+	if (!empty($limit)) {
+		$sql_limit = "LIMIT " . intval($limit);
+	}
 
 	$query = "SELECT "
 		. "orders.*, "
@@ -111,6 +113,7 @@ function anthrocon_dealers_get_tables_sold() {
 		. "order_products.nid = '%s' "
 		. "ORDER BY "
 		. "orders.order_id ASC "
+		. $sql_limit
 		;
 	$query_args = array($nid);
 	$cursor = db_query($query, $query_args);
@@ -149,5 +152,42 @@ function anthrocon_dealers_process_order_data(&$row) {
 	unset($row["data"]);
 
 } // End of anthrocon_dealers_process_order_data()
+
+
+/**
+* Theme up our sold tables in HTML tables.
+*
+* @param array $data An array of rows
+*
+* @return string HTML code
+*/
+function anthrocon_dealers_format_tables_sold($data) {
+
+	$retval = "";
+
+	$header = array(t("Order ID"), t("Cost"), t("Name"), t("Dealership"));
+	$rows = array();
+	$attributes = array();
+
+	foreach ($data as $key => $value) {
+		$row = array();
+		$row[] = array("align" => "right", "data" => $value["order_id"]);
+		$row[] = array(
+			"align" => "right",
+			"data" => "$" . number_format($value["order_total"], 2)
+			);
+		$row[] = $value["billing_first_name"] 
+			. " " . $value["billing_last_name"];
+		$row[] = $value["attribute-Name of Dealership"];
+
+		$rows[] = $row;
+
+	}
+
+	$retval = theme("table", $header, $rows, $attributes);
+
+	return($retval);
+
+} // End of anthrocon_dealers_format_tables_sold()
 
 
