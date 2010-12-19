@@ -94,9 +94,25 @@ function anthrocon_dealers_form_submit($form, $form_state) {
 	//
 	$text = anthrocon_dealers_get_tables_sold_text($rows);
 
-// TEST
-print "<pre>";
-print $text;
+	//
+	// Start a download in the user's browser
+	//
+	$header = "Content-Type: octet/stream";
+	drupal_set_header($header);
+
+	$filename = "dealer_orders.txt";
+	$header = "Content-Disposition: attachment; filename=\"$filename\"";
+	drupal_set_header($header);
+
+	//
+	// And print up our text!
+	//
+	print $text;
+
+	//
+	// Not sure if I have to put an exit() call here or not.
+	// For now, this seems to be working without any issues in Google Chrome.
+	//
 
 } // End of anthrocon_dealers_submit()
 
