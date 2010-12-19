@@ -41,13 +41,20 @@ function anthrocon_dealers_main() {
 
 	$retval = "";
 
-	$retval = drupal_get_form("anthrocon_dealers_form");
+// TODO: Move this into the form handler
+	$rows = anthrocon_dealers_get_tables_sold();
+	//$retval .= "<pre>" . print_r($rows, true) . "</pre>"; // Debugging
+
+	$retval .= drupal_get_form("anthrocon_dealers_form");
 
 	return($retval);
 
 } // End of anthrocon_dealers_main()
 
 
+/**
+* Generate our form for viewing/downloading dealer tables.
+*/
 function anthrocon_dealers_form() {
 
 	$retval = array();
@@ -77,5 +84,70 @@ function anthrocon_dealers_form_submit($form, $form_state) {
 //print_r($form_state);
 
 } // End of anthrocon_dealers_submit()
+
+
+/**
+* Get current dealer tables that have been sold.
+*
+* @return array An array of sold tables.
+*/
+function anthrocon_dealers_get_tables_sold() {
+
+	$retval = array();
+
+	//
+	// Hard-coded to the NID of the dealers table
+	//
+	$nid = 6135;
+
+	$query = "SELECT "
+		. "orders.*, "
+		. "order_products.* "
+		. "FROM "
+		. "uc_orders AS orders "
+		. "JOIN uc_order_products AS order_products "
+			. "ON order_products.order_id = orders.order_id "
+		. "WHERE "
+		. "order_products.nid = '%s' "
+		. "ORDER BY "
+		. "orders.order_id ASC "
+		;
+	$query_args = array($nid);
+	$cursor = db_query($query, $query_args);
+	while ($row = db_fetch_array($cursor)) {
+		anthrocon_dealers_process_order_data($row);
+		$retval[] = $row;
+	}
+
+	return($retval);
+
+} // End of anthrocon_dealers_get_tables_sold()
+
+
+/**
+* Process the data field in each order, which is a serialized string of 
+* option data for each order.
+*
+* I have NO idea why the Ubercart people stored stuff this way...
+*
+* @param array $row The current row we're processing.  It is passed by 
+*	reference and its "data" key is updated.
+*/
+function anthrocon_dealers_process_order_data(&$row) {
+
+	$tmp = unserialize($row["data"]);
+	foreach ($tmp["attributes"] as $key => $value) {
+
+		$new_key = "attribute-" . $key;
+		$row[$new_key] = $value[0];
+
+	}
+
+	//
+	// We don't need this anymore.
+	//
+	unset($row["data"]);
+
+} // End of anthrocon_dealers_process_order_data()
 
 
