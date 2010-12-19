@@ -43,6 +43,7 @@ function anthrocon_dealers_main() {
 	$retval .= drupal_get_form("anthrocon_dealers_form");
 
 	$rows = anthrocon_dealers_get_tables_sold();
+	//$retval .= "<pre>" . print_r($rows, true) . "</pre>"; // Debugging
 	$retval .= anthrocon_dealers_get_tables_sold_html($rows);
 	//$retval .= "<pre>" . print_r($rows, true) . "</pre>"; // Debugging
 
@@ -189,6 +190,13 @@ function anthrocon_dealers_process_order_data(&$row) {
 	//
 	unset($row["data"]);
 
+	//
+	// Filter out tabs from here.  I accidentally added a tab to the end
+	// of the "double table" item when I created it.  Oops!
+	//
+	$key = "attribute-Table Size";
+	$row[$key] = preg_replace("/\t/", "", $row[$key]);
+
 } // End of anthrocon_dealers_process_order_data()
 
 
@@ -203,7 +211,7 @@ function anthrocon_dealers_get_tables_sold_html($data) {
 
 	$retval = "";
 
-	$header = array(t("Order ID"), t("Cost"), t("Name"), t("Dealership"));
+	$header = array(t("Order ID"), t("Cost"), t("Name"), t("Dealership"), t("Table Size"));
 	$rows = array();
 	$attributes = array();
 
@@ -217,6 +225,7 @@ function anthrocon_dealers_get_tables_sold_html($data) {
 		$row[] = $value["billing_first_name"] 
 			. " " . $value["billing_last_name"];
 		$row[] = $value["attribute-Name of Dealership"];
+		$row[] = $value["attribute-Table Size"];
 
 		$rows[] = $row;
 
