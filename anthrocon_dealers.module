@@ -42,9 +42,8 @@ function anthrocon_dealers_main() {
 
 	$retval .= drupal_get_form("anthrocon_dealers_form");
 
-// TODO: Move this into the form handler
 	$rows = anthrocon_dealers_get_tables_sold();
-$retval .= anthrocon_dealers_format_tables_sold($rows);
+	$retval .= anthrocon_dealers_get_tables_sold_html($rows);
 	//$retval .= "<pre>" . print_r($rows, true) . "</pre>"; // Debugging
 
 	return($retval);
@@ -74,9 +73,30 @@ function anthrocon_dealers_form() {
 } // End of anthrocon_dealers_form()
 
 
+/**
+* Our form submission handler.
+*/
 function anthrocon_dealers_form_submit($form, $form_state) {
-//print_r($form);
-//print_r($form_state);
+
+	//
+	// What button did we click?
+	// We'll need this if we add more buttons later.
+	//
+	$op = $form_state["values"]["op"];
+
+	//
+	// Retrieve our current tables sold.
+	//
+	$rows = anthrocon_dealers_get_tables_sold();
+
+	//
+	// Get tab-delimited text
+	//
+	$text = anthrocon_dealers_get_tables_sold_text($rows);
+
+// TEST
+print "<pre>";
+print $text;
 
 } // End of anthrocon_dealers_submit()
 
@@ -161,7 +181,7 @@ function anthrocon_dealers_process_order_data(&$row) {
 *
 * @return string HTML code
 */
-function anthrocon_dealers_format_tables_sold($data) {
+function anthrocon_dealers_get_tables_sold_html($data) {
 
 	$retval = "";
 
@@ -188,6 +208,50 @@ function anthrocon_dealers_format_tables_sold($data) {
 
 	return($retval);
 
-} // End of anthrocon_dealers_format_tables_sold()
+} // End of anthrocon_dealers_get_tables_sold_html()
+
+
+/**
+* Convert the list of dealer tables into tab-delimited text.
+*
+* @param array $rows An array of rows of dealer tables.
+*
+* @return string tab-delimited text, with a header.
+*/
+function anthrocon_dealers_get_tables_sold_text($rows) {
+
+	$retval = "";
+
+	//
+	// Our column delimiter
+	//
+	$delimiter = "\t";
+
+	//
+	// Our row delimiter.
+	//
+	$end = "\r\n";
+
+	foreach ($rows as $key => $value) {
+
+		$line = "";
+
+		//
+		// First time around?  Generate our header row.
+		//
+		if (empty($retval)) {
+			$retval .= join($delimiter, array_keys($value)) . $end;
+		}
+
+		//
+		// Now grab the values for this row.
+		//
+		$retval .= join($delimiter, array_values($value)) . $end;
+
+	}
+
+	return($retval);
+
+} // End of anthrocon_dealers_get_tables_sold_text()
 
 
