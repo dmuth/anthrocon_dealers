@@ -69,6 +69,11 @@ function anthrocon_dealers_form() {
 		"#value" => t("Download This List"),
 		);
 
+	$retval["tables"]["browser_dump"] = array(
+		"#type" => "checkbox",
+		"#title" => t("Dump to browser instead. (for testing/debugging purposes)"),
+		);
+
 	return($retval);
 
 } // End of anthrocon_dealers_form()
@@ -79,11 +84,14 @@ function anthrocon_dealers_form() {
 */
 function anthrocon_dealers_form_submit($form, $form_state) {
 
+	//print "<pre>"; print_r($form_state); print "</pre>"; // Debugging
+
 	//
 	// What button did we click?
 	// We'll need this if we add more buttons later.
 	//
 	$op = $form_state["values"]["op"];
+	$dump = $form_state["values"]["browser_dump"];
 
 	//
 	// Retrieve our current tables sold.
@@ -95,15 +103,25 @@ function anthrocon_dealers_form_submit($form, $form_state) {
 	//
 	$text = anthrocon_dealers_get_tables_sold_text($rows);
 
-	//
-	// Start a download in the user's browser
-	//
-	$header = "Content-Type: octet/stream";
-	drupal_set_header($header);
 
-	$filename = "dealer_orders.txt";
-	$header = "Content-Disposition: attachment; filename=\"$filename\"";
-	drupal_set_header($header);
+	if (!$dump) {
+		//
+		// Start a download in the user's browser
+		//
+		$header = "Content-Type: octet/stream";
+		drupal_set_header($header);
+
+		$filename = "dealer_orders.txt";
+		$header = "Content-Disposition: attachment; filename=\"$filename\"";
+		drupal_set_header($header);
+
+	} else {
+		//
+		// We're dumping to the browser. Formatting time!
+		//
+		print "<pre>";
+
+	}
 
 	//
 	// And print up our text!
