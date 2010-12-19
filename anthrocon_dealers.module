@@ -41,10 +41,41 @@ function anthrocon_dealers_main() {
 
 	$retval = "";
 
-$retval = "placeholder";
+	$retval = drupal_get_form("anthrocon_dealers_form");
 
 	return($retval);
 
 } // End of anthrocon_dealers_main()
+
+
+function anthrocon_dealers_form() {
+
+	$retval = array();
+
+	$retval["tables"] = array(
+		"#type" => "fieldset",
+		"#title" => t("Dealer Tables"),
+		);
+
+	$retval["tables"]["view"] = array(
+		"#type" => "submit",
+		"#value" => t("View"),
+		);
+
+	$retval["tables"]["download"] = array(
+		"#type" => "submit",
+		"#value" => t("Download"),
+		);
+
+	return($retval);
+
+} // End of anthrocon_dealers_form()
+
+
+function anthrocon_dealers_form_submit($form, $form_state) {
+//print_r($form);
+//print_r($form_state);
+
+} // End of anthrocon_dealers_submit()
 
 
