@@ -9,7 +9,9 @@
 
 
 include_once("form.inc.php");
+include_once("html.inc.php");
 include_once("menu.inc.php");
+include_once("text.inc.php");
 
 
 /**
@@ -113,86 +115,5 @@ function anthrocon_dealers_process_order_data(&$row) {
 
 } // End of anthrocon_dealers_process_order_data()
 
-
-/**
-* Theme up our sold tables in HTML tables.
-*
-* @param array $data An array of rows
-*
-* @return string HTML code
-*/
-function anthrocon_dealers_get_tables_sold_html($data) {
-
-	$retval = "";
-
-	$header = array(t("Order ID"), t("Cost"), t("Name"), t("Dealership"), t("Table Size"));
-	$rows = array();
-	$attributes = array();
-
-	foreach ($data as $key => $value) {
-		$row = array();
-		$row[] = array("align" => "right", "data" => $value["order_id"]);
-		$row[] = array(
-			"align" => "right",
-			"data" => "$" . number_format($value["order_total"], 2)
-			);
-		$row[] = $value["billing_first_name"] 
-			. " " . $value["billing_last_name"];
-		$row[] = $value["attribute-Name of Dealership"];
-		$row[] = $value["attribute-Table Size"];
-
-		$rows[] = $row;
-
-	}
-
-	$retval = theme("table", $header, $rows, $attributes);
-
-	return($retval);
-
-} // End of anthrocon_dealers_get_tables_sold_html()
-
-
-/**
-* Convert the list of dealer tables into tab-delimited text.
-*
-* @param array $rows An array of rows of dealer tables.
-*
-* @return string tab-delimited text, with a header.
-*/
-function anthrocon_dealers_get_tables_sold_text($rows) {
-
-	$retval = "";
-
-	//
-	// Our column delimiter
-	//
-	$delimiter = "\t";
-
-	//
-	// Our row delimiter.
-	//
-	$end = "\r\n";
-
-	foreach ($rows as $key => $value) {
-
-		$line = "";
-
-		//
-		// First time around?  Generate our header row.
-		//
-		if (empty($retval)) {
-			$retval .= join($delimiter, array_keys($value)) . $end;
-		}
-
-		//
-		// Now grab the values for this row.
-		//
-		$retval .= join($delimiter, array_values($value)) . $end;
-
-	}
-
-	return($retval);
-
-} // End of anthrocon_dealers_get_tables_sold_text()
 
 
