@@ -55,6 +55,9 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 		$sql_limit = "LIMIT " . intval($limit);
 	}
 
+	$start_date = anthrocon_dealers_get_tables_start_date();
+	//print "<pre>" . date("c", $start_date) . "</pre>"; // Debugging
+
 	$query = "SELECT "
 		. "orders.*, "
 		. "billing_zones.zone_code AS billing_state, "
@@ -76,11 +79,12 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 		. "order_products.nid = '%s' "
 		. "AND orders.order_status != 'canceled' "
 		. "AND orders.order_status != 'in_checkout' "
+		. "AND orders.created >= %d "
 		. "ORDER BY "
 		. "orders.order_id ASC "
 		. $sql_limit
 		;
-	$query_args = array($nid);
+	$query_args = array($nid, $start_date);
 	$cursor = db_query($query, $query_args);
 	while ($row = db_fetch_array($cursor)) {
 		//print "<pre>"; print_r($row); print "</pre>"; // Debugging
@@ -125,6 +129,42 @@ function anthrocon_dealers_process_order_data(&$row) {
 	$row[$key] = preg_replace("/\t/", "", $row[$key]);
 
 } // End of anthrocon_dealers_process_order_data()
+
+
+/**
+* Get the starting date to search from
+*
+* @return integer time_t The starting date
+*/
+function anthrocon_dealers_get_tables_start_date() {
+
+	$retval = "";
+
+	$year = date("Y");
+	$month = date("n");
+
+	//
+	// Represents July, which is close enough to when we have the con.
+	//
+	$middle = 7;
+
+	if ($month >= $middle) {
+		//
+		// If we're in the second half the year.
+		//
+		$retval = mktime(0, 0, 0, $middle, 0, $year);
+
+	} else {
+		//
+		// We're in the following year, so get the date for the previous year.
+		//
+		$retval = mktime(0, 0, 0, $middle, 0, ($year - 1));
+
+	}
+
+	return($retval);
+
+} // End of anthrocon_dealers_get_tables_start_date()
 
 
 
