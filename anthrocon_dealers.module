@@ -48,7 +48,8 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 	//
 	// Hard-coded to the NID of the dealers table
 	//
-	$nid = 6135;
+	//$nid = 6135;
+	$nid = 7385;
 
 	$sql_limit = "";
 	if (!empty($limit)) {
