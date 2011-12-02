@@ -45,11 +45,12 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 
 	$retval = array();
 
-	//
-	// Hard-coded to the NID of the dealers table
-	//
-	//$nid = 6135;
-	$nid = 7385;
+	$nid = variable_get("anthrocon_dealers_nid", "");
+
+	if (!$nid) {
+		drupal_set_message("Please select a product!", "error");
+		return($retval);
+	}
 
 	$sql_limit = "";
 	if (!empty($limit)) {
@@ -166,6 +167,40 @@ function anthrocon_dealers_get_tables_start_date() {
 	return($retval);
 
 } // End of anthrocon_dealers_get_tables_start_date()
+
+
+/**
+* Return a list of all products from the Ubercart store.
+*
+* @param string $header The first line to include in the array we
+*	return.
+*
+* @return array An array of all products.
+*/
+function anthrocon_dealers_get_products($header) {
+
+	$retval = array();
+
+	if ($header) {
+		$retval[] = $header;
+	}
+
+	$query = "SELECT node.nid, node.title "
+		. "FROM uc_products AS u "
+		. "JOIN {node} ON "
+			. "u.nid = node.nid AND u.vid = node.vid "
+		. "ORDER BY node.nid DESC "
+		;
+	$cursor = db_query($query);
+	while ($row = db_fetch_array($cursor)) {
+		$nid = $row["nid"];
+		$title = $row["title"] . " (NID: $nid)";
+		$retval[$nid] = $title;
+	}
+
+	return($retval);
+
+} // End of anthrocon_dealers_get_products()
 
 
 
