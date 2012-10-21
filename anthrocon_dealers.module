@@ -63,7 +63,7 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 	$query = "SELECT "
 		. "orders.*, "
 		. "billing_zones.zone_code AS billing_state, "
-		. "delivery_zones.zone_code AS delivery_state, "
+		//. "delivery_zones.zone_code AS delivery_state, "
 		. "order_products.* "
 		. "FROM "
 		. "{uc_orders} AS orders "
@@ -74,8 +74,8 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 		// 
 		. "JOIN {uc_zones} AS billing_zones "
 			. "ON orders.billing_zone = billing_zones.zone_id "
-		. "JOIN {uc_zones} AS delivery_zones "
-			. "ON orders.delivery_zone = delivery_zones.zone_id "
+		//. "JOIN {uc_zones} AS delivery_zones "
+		//	. "ON orders.delivery_zone = delivery_zones.zone_id "
 
 		. "WHERE "
 		. "order_products.nid = '%s' "
