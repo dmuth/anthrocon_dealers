@@ -57,9 +57,6 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 		$sql_limit = "LIMIT " . intval($limit);
 	}
 
-	$start_date = anthrocon_dealers_get_tables_start_date();
-	//print "<pre>" . date("c", $start_date) . "</pre>"; // Debugging
-
 	$query = "SELECT "
 		. "orders.*, "
 		. "billing_zones.zone_code AS billing_state, "
@@ -81,12 +78,11 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 		. "order_products.nid = '%s' "
 		. "AND orders.order_status != 'canceled' "
 		. "AND orders.order_status != 'in_checkout' "
-		. "AND orders.created >= %d "
 		. "ORDER BY "
 		. "orders.order_id ASC "
 		. $sql_limit
 		;
-	$query_args = array($nid, $start_date);
+	$query_args = array($nid);
 	$cursor = db_query($query, $query_args);
 	while ($row = db_fetch_array($cursor)) {
 		//print "<pre>"; print_r($row); print "</pre>"; // Debugging
