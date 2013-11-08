@@ -110,7 +110,7 @@ function anthrocon_dealers_process_order_data(&$row) {
 	foreach ($tmp["attributes"] as $key => $value) {
 
 		$new_key = "attribute-" . $key;
-		$row[$new_key] = $value[0];
+		$row[$new_key] = join(", ", $value);
 
 	}
 
