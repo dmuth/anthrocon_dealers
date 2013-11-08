@@ -79,7 +79,7 @@ function anthrocon_dealers_get_tables_sold($limit = "") {
 		. "AND orders.order_status != 'canceled' "
 		. "AND orders.order_status != 'in_checkout' "
 		. "ORDER BY "
-		. "orders.order_id ASC "
+		. "orders.order_id DESC "
 		. $sql_limit
 		;
 	$query_args = array($nid);
